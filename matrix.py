@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import os 
+import os
 from collections import defaultdict
 
 
@@ -18,7 +18,19 @@ def co_occurrence_matrix(corpus, window_size=1):
     word_counts = defaultdict(int)
     co_occurrence_counts = defaultdict(lambda: defaultdict(int))
 
+    # Replaces the funny quotation/apostrophe on Mac systems with the standard ascii ones
+    replacements = {
+        "‘": "'",  # left single quote
+        "’": "'",  # right single quote
+        "“": '"',  # left double quote
+        "”": '"',  # right double quote
+    }
+
     for sentence in corpus:
+        # the replacement
+        for fancy, ascii_char in replacements.items():
+            sentence = sentence.replace(fancy, ascii_char)
+
         words = sentence.lower().split()
         for i, word in enumerate(words):
             word_counts[word] += 1
@@ -36,8 +48,10 @@ def co_occurrence_matrix(corpus, window_size=1):
 
     return df
 
+
 if __name__ == '__main__':
-    corpus = [open(os.path.join("data",f)).read() for f in os.listdir("data")]
+    corpus = [open(os.path.join("data", f), encoding='utf-8').read()
+              for f in os.listdir("data")]
 
     co_matrix = co_occurrence_matrix(corpus, window_size=7)
-    
+    print(co_matrix)
